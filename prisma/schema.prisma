@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  ADMIN
+}
+
+enum PostType {
+  TEXT
+  IMAGE
+  GALLERY
+  VIDEO
+  ARTICLE
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SPAM
+}
+
+model Admin {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         AdminRole @default(ADMIN)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  posts Post[]
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  parentId    String?
+  sort        Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  posts    Post[]
+
+  @@index([parentId])
+  @@index([sort])
+}
+
+model Post {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  description String
+  content     String
+  summary     String?
+  type        PostType   @default(ARTICLE)
+  status      PostStatus @default(DRAFT)
+  coverImage  String?
+  publishedAt DateTime?
+  viewCount   Int        @default(0)
+  cameraModel String?
+  lens        String?
+  aperture    String?
+  shutter     String?
+  iso         String?
+  focalLength String?
+  categoryId  String
+  authorId    String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+
+  category Category    @relation(fields: [categoryId], references: [id])
+  author   Admin?      @relation(fields: [authorId], references: [id])
+  media    PostMedia[]
+  tags     PostTag[]
+  comments Comment[]
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([publishedAt])
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  posts PostTag[]
+}
+
+model PostTag {
+  id        String    @id @default(cuid())
+  postId    String
+  tagId     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, tagId])
+  @@index([tagId])
+}
+
+model Media {
+  id         String    @id @default(cuid())
+  url        String
+  type       MediaType
+  mimeType   String
+  width      Int?
+  height     Int?
+  alt        String?
+  caption    String?
+  storageKey String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  posts PostMedia[]
+}
+
+model PostMedia {
+  id        String    @id @default(cuid())
+  postId    String
+  mediaId   String
+  sort      Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  post  Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, mediaId])
+  @@index([sort])
+}
+
+model Comment {
+  id            String        @id @default(cuid())
+  postId        String
+  nickname      String
+  email         String
+  content       String
+  parentId      String?
+  status        CommentStatus @default(APPROVED)
+  highlighted   Boolean       @default(false)
+  ipHash        String?
+  userAgentHash String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  post    Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@index([parentId])
+  @@index([status])
+}
