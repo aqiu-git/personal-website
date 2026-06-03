@@ -50,6 +50,14 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
     summary: post.summary,
     type: post.type,
     coverImage: post.coverImage,
+    media: post.media
+      .map((item) => item.media)
+      .filter((media) => media.type === "IMAGE")
+      .map((media) => ({
+        id: media.id,
+        url: media.url,
+        alt: media.alt ?? post.title
+      })),
     publishedAt: post.publishedAt?.toISOString() ?? null,
     createdAt: post.createdAt.toISOString(),
     categoryName: post.category.name,

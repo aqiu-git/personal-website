@@ -24,6 +24,14 @@ const AdminPostsPage = async () => {
       where: { deletedAt: null },
       include: {
         category: true,
+        media: {
+          include: {
+            media: true
+          },
+          orderBy: {
+            sort: "asc"
+          }
+        },
         comments: {
           where: { deletedAt: null },
           orderBy: [{ highlighted: "desc" }, { createdAt: "desc" }]
@@ -73,6 +81,7 @@ const AdminPostsPage = async () => {
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <Badge>{post.status}</Badge>
                   <Badge>{post.category.name}</Badge>
+                  {post.media.length > 1 ? <Badge>共 {post.media.length} 张</Badge> : null}
                   <span className="text-sm text-muted-foreground">{formatDate(post.createdAt)}</span>
                 </div>
               </div>

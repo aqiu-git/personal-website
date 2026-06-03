@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { MarkdownContent } from "@/components/markdown-content";
+import { PostImageGrid } from "@/components/post-image-grid";
 import { PostCommentsPanel } from "@/components/post-comments-panel";
 import { Badge } from "@/components/ui/badge";
 import { getDownloadHref } from "@/lib/download";
@@ -40,7 +40,20 @@ const PostPage = async ({ params }: PostPageProps) => {
     post.iso,
     post.focalLength
   ].filter(Boolean);
-  const downloadHref = getDownloadHref(post.coverImage, post.slug);
+  const imageMedia = post.media
+    .map((item) => item.media)
+    .filter((media) => media.type === "IMAGE")
+    .map((media) => ({
+      id: media.id,
+      url: media.url,
+      alt: media.alt ?? post.title
+    }));
+  const gridImages =
+    imageMedia.length > 0
+      ? imageMedia
+      : post.coverImage
+        ? [{ id: post.id, url: post.coverImage, alt: post.title }]
+        : [];
 
   return (
     <main className="container max-w-4xl space-y-10 py-12">
@@ -58,24 +71,24 @@ const PostPage = async ({ params }: PostPageProps) => {
           </p>
         </header>
 
-        {post.coverImage ? (
+        {gridImages.length > 0 ? (
           <div className="space-y-3">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              width={1400}
-              height={900}
-              className="aspect-[16/10] w-full rounded-lg object-cover"
-              priority
-            />
-            {downloadHref ? (
-              <a
-                href={downloadHref}
-                className="inline-flex h-9 items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 text-xs font-medium text-emerald-800 hover:bg-emerald-100"
-              >
-                下载这张图
-              </a>
-            ) : null}
+            <PostImageGrid images={gridImages} priority />
+            <div className="flex flex-wrap gap-2">
+              {gridImages.map((image, index) => {
+                const downloadHref = getDownloadHref(image.url, `${post.slug}-${index + 1}`);
+
+                return downloadHref ? (
+                  <a
+                    key={image.id}
+                    href={downloadHref}
+                    className="inline-flex h-9 items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 text-xs font-medium text-emerald-800 hover:bg-emerald-100"
+                  >
+                    下载图片 {index + 1}
+                  </a>
+                ) : null;
+              })}
+            </div>
           </div>
         ) : null}
 

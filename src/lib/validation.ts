@@ -15,6 +15,11 @@ export const loginSchema = z.object({
   password: z.string().min(8)
 });
 
+export const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(8),
+  newPassword: z.string().min(10).max(128)
+});
+
 export const postQuerySchema = z.object({
   category: z.string().optional(),
   q: z.string().optional(),
@@ -34,7 +39,7 @@ export const postMutationSchema = z.object({
   coverImage: mediaUrlSchema.optional(),
   categoryId: z.string().min(1),
   publishedAt: z.string().datetime().optional(),
-  mediaIds: z.array(z.string().min(1)).max(20).optional()
+  mediaIds: z.array(z.string().min(1)).max(9).optional()
 });
 
 export const categoryMutationSchema = z.object({

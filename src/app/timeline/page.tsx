@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { PostImageGrid } from "@/components/post-image-grid";
 import { TimelinePostInteractions } from "@/components/timeline-post-interactions";
 import { Badge } from "@/components/ui/badge";
 import { getPublishedPosts } from "@/lib/posts";
@@ -34,21 +34,7 @@ const TimelinePage = async () => {
                   className="rounded-3xl border border-orange-100 bg-card p-3 shadow-sm shadow-orange-100/70 transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <div className="grid gap-4 md:grid-cols-[156px_minmax(0,1fr)]">
-                    <Link href={`/posts/${post.slug}`} className="block overflow-hidden rounded-2xl">
-                      {post.coverImage ? (
-                        <Image
-                          src={post.coverImage}
-                          alt={post.title}
-                          width={312}
-                          height={220}
-                          className="aspect-[16/11] w-full object-cover transition-transform duration-500 hover:scale-[1.025]"
-                        />
-                      ) : (
-                        <div className="flex aspect-[16/11] items-center justify-center rounded-2xl bg-orange-50 text-xs text-muted-foreground">
-                          无缩图
-                        </div>
-                      )}
-                    </Link>
+                    <TimelineImages post={post} />
                     <div className="min-w-0 py-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge className="border-orange-100 bg-orange-50 text-orange-700">
@@ -82,3 +68,28 @@ const TimelinePage = async () => {
 };
 
 export default TimelinePage;
+
+const TimelineImages = ({ post }: { post: Awaited<ReturnType<typeof getPublishedPosts>>[number] }) => {
+  const images = post.media
+    .map((item) => item.media)
+    .filter((media) => media.type === "IMAGE")
+    .map((media) => ({
+      id: media.id,
+      url: media.url,
+      alt: media.alt ?? post.title
+    }));
+  const gridImages =
+    images.length > 0
+      ? images
+      : post.coverImage
+        ? [{ id: post.id, url: post.coverImage, alt: post.title }]
+        : [];
+
+  return gridImages.length > 0 ? (
+    <PostImageGrid images={gridImages} href={`/posts/${post.slug}`} />
+  ) : (
+    <div className="flex aspect-[16/11] items-center justify-center rounded-2xl bg-orange-50 text-xs text-muted-foreground">
+      无缩图
+    </div>
+  );
+};

@@ -4,7 +4,8 @@ const adminLinks = [
   { href: "/admin", label: "仪表盘" },
   { href: "/admin/posts", label: "内容与评论" },
   { href: "/admin/categories", label: "分类管理" },
-  { href: "/admin/media", label: "媒体库" }
+  { href: "/admin/media", label: "媒体库" },
+  { href: "/admin/account", label: "账号安全" }
 ];
 
 export const AdminNav = () => (

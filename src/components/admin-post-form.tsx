@@ -2,7 +2,7 @@
 
 import { PostStatus, PostType, type Category } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AdminMediaPicker } from "@/components/admin-media-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,13 +61,19 @@ export const AdminPostForm = ({ categories }: AdminPostFormProps) => {
   );
   const defaultParentId = parentCategories[0]?.id ?? "";
   const [parentId, setParentId] = useState(defaultParentId);
+  const [categoryId, setCategoryId] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mediaResetKey, setMediaResetKey] = useState(0);
   const childCategories = useMemo(
     () => categories.filter((category) => category.parentId === parentId),
     [categories, parentId]
   );
-  const selectedCategoryId = childCategories[0]?.id ?? parentId;
+  const availableCategories = childCategories.length > 0 ? childCategories : parentCategories;
+
+  useEffect(() => {
+    setCategoryId(availableCategories[0]?.id ?? "");
+  }, [availableCategories]);
 
   return (
     <section
@@ -95,27 +101,49 @@ export const AdminPostForm = ({ categories }: AdminPostFormProps) => {
           let coverImage: string | undefined;
           let mediaIds: string[] | undefined;
           let postType: PostType = PostType.TEXT;
-          const file = formData.get("media");
+          const files = formData
+            .getAll("media")
+            .filter((file): file is File => file instanceof File && file.size > 0);
 
-          if (file instanceof File && file.size > 0) {
-            const mediaForm = new FormData();
-            mediaForm.set("file", file);
-            mediaForm.set("alt", title);
-            const uploadResponse = await fetch("/api/media", {
-              method: "POST",
-              body: mediaForm
-            });
-            const payload: unknown = await uploadResponse.json();
+          if (files.length > 9) {
+            setIsSubmitting(false);
+            setMessage("最多只能发布 9 张图片。");
+            return;
+          }
 
-            if (!uploadResponse.ok || !isMediaPayload(payload)) {
-              setIsSubmitting(false);
-              setMessage("媒体上传失败，请换一个文件再试。");
-              return;
+          if (files.length > 0) {
+            const uploadedMedia: MediaPayload["media"][] = [];
+
+            for (const file of files) {
+              const mediaForm = new FormData();
+              mediaForm.set("file", file);
+              mediaForm.set("alt", title);
+              const uploadResponse = await fetch("/api/media", {
+                method: "POST",
+                body: mediaForm
+              });
+              const payload: unknown = await uploadResponse.json();
+
+              if (!uploadResponse.ok || !isMediaPayload(payload)) {
+                setIsSubmitting(false);
+                setMessage("媒体上传失败，请换一个文件再试。");
+                return;
+              }
+
+              uploadedMedia.push(payload.media);
             }
 
-            coverImage = payload.media.type === "IMAGE" ? payload.media.url : undefined;
-            mediaIds = [payload.media.id];
-            postType = payload.media.type === "IMAGE" ? PostType.IMAGE : PostType.VIDEO;
+            const firstImage = uploadedMedia.find((media) => media.type === "IMAGE");
+            const firstMedia = uploadedMedia[0];
+
+            coverImage = firstImage?.url;
+            mediaIds = uploadedMedia.map((media) => media.id);
+            postType =
+              uploadedMedia.length > 1
+                ? PostType.GALLERY
+                : firstMedia?.type === "VIDEO"
+                  ? PostType.VIDEO
+                  : PostType.IMAGE;
           }
 
           const content = formData.get("content")?.toString().trim() ?? "";
@@ -132,7 +160,7 @@ export const AdminPostForm = ({ categories }: AdminPostFormProps) => {
               status,
               coverImage,
               mediaIds,
-              categoryId: formData.get("categoryId")?.toString() || selectedCategoryId,
+              categoryId,
               publishedAt: status === PostStatus.PUBLISHED ? new Date().toISOString() : undefined
             })
           });
@@ -145,6 +173,7 @@ export const AdminPostForm = ({ categories }: AdminPostFormProps) => {
           }
 
           form.reset();
+          setMediaResetKey((value) => value + 1);
           setMessage("发布成功，前台已经能看到了。");
           router.refresh();
         }}
@@ -170,8 +199,14 @@ export const AdminPostForm = ({ categories }: AdminPostFormProps) => {
           </label>
           <label className="grid gap-2 text-sm font-medium">
             二级类目
-            <select name="categoryId" defaultValue={selectedCategoryId} className={selectClass} required>
-              {(childCategories.length > 0 ? childCategories : parentCategories).map((category) => (
+            <select
+              name="categoryId"
+              value={categoryId}
+              className={selectClass}
+              required
+              onChange={(event) => setCategoryId(event.target.value)}
+            >
+              {availableCategories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
@@ -182,7 +217,7 @@ export const AdminPostForm = ({ categories }: AdminPostFormProps) => {
         <Input name="description" placeholder="一句话描述" required className={inputClass} />
         <Input name="summary" placeholder="摘要，可选" className={inputClass} />
         <div className="grid gap-3 md:grid-cols-2">
-          <AdminMediaPicker />
+          <AdminMediaPicker resetKey={mediaResetKey} />
           <label className="grid gap-2 text-sm font-medium">
             发布状态
             <select name="status" defaultValue={PostStatus.PUBLISHED} className={selectClass}>
@@ -200,7 +235,7 @@ export const AdminPostForm = ({ categories }: AdminPostFormProps) => {
         <div className="flex flex-wrap items-center gap-3">
           <Button
             type="submit"
-            disabled={isSubmitting || !selectedCategoryId}
+            disabled={isSubmitting || !categoryId}
             className="rounded-full bg-blue-500 px-6 hover:bg-blue-600"
           >
             {isSubmitting ? "发布中..." : "发布内容"}

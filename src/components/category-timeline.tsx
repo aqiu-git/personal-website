@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { FormEvent, PointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
+import { PostImageGrid, type PostGridImage } from "@/components/post-image-grid";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +19,7 @@ export type CategoryTimelinePost = {
   summary: string | null;
   type: string;
   coverImage: string | null;
+  media: PostGridImage[];
   publishedAt: string | null;
   createdAt: string;
   categoryName: string;
@@ -185,6 +187,12 @@ const TimelineCard = ({
   );
   const isPet = post.parentCategoryName === "猫咪萌照" || post.categoryName.includes("猫");
   const downloadHref = getDownloadHref(post.coverImage, post.slug);
+  const gridImages =
+    post.media.length > 0
+      ? post.media
+      : post.coverImage
+        ? [{ id: post.id, url: post.coverImage, alt: post.title }]
+        : [];
 
   const toggleReaction = (nextReaction: "like" | "dislike") => {
     setReaction((currentReaction) => {
@@ -225,18 +233,7 @@ const TimelineCard = ({
           : "border-orange-100 shadow-orange-100/70"
       )}
     >
-      {post.coverImage ? (
-        <Link href={`/posts/${post.slug}`} className="block overflow-hidden">
-          <Image
-            src={post.coverImage}
-            alt={post.title}
-            width={900}
-            height={620}
-            className="aspect-[4/3] w-full object-cover transition-transform duration-500 hover:scale-[1.025]"
-            priority={priority}
-          />
-        </Link>
-      ) : null}
+      <PostImageGrid images={gridImages} href={`/posts/${post.slug}`} priority={priority} />
       <div className="space-y-4 p-5">
         <div className="flex flex-wrap gap-2">
           <Badge className="border-orange-100 bg-orange-50 text-orange-700">
