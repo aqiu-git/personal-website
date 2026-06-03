@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { FormEvent, PointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
+import { CuteLikeButton } from "@/components/cute-like-button";
 import { PostImageGrid, type PostGridImage } from "@/components/post-image-grid";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -182,11 +183,7 @@ const TimelineCard = ({
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [commentMessage, setCommentMessage] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
-  const [reaction, setReaction] = useState<"like" | "dislike" | null>(null);
-  const [likeCount, setLikeCount] = useState(() => getInitialReactionCount(post.id, "like"));
-  const [dislikeCount, setDislikeCount] = useState(() =>
-    getInitialReactionCount(post.id, "dislike")
-  );
+  const [dislikeCount, setDislikeCount] = useState(() => getInitialDislikeCount(post.id));
   const isPet = post.parentCategoryName === "猫咪萌照" || post.categoryName.includes("猫");
   const downloadHref = getDownloadHref(post.coverImage, post.slug);
   const gridImages =
@@ -195,36 +192,6 @@ const TimelineCard = ({
       : post.coverImage
         ? [{ id: post.id, url: post.coverImage, alt: post.title }]
         : [];
-
-  const toggleReaction = (nextReaction: "like" | "dislike") => {
-    setReaction((currentReaction) => {
-      if (currentReaction === nextReaction) {
-        if (nextReaction === "like") {
-          setLikeCount((count) => Math.max(0, count - 1));
-        } else {
-          setDislikeCount((count) => Math.max(0, count - 1));
-        }
-
-        return null;
-      }
-
-      if (nextReaction === "like") {
-        setLikeCount((count) => count + 1);
-
-        if (currentReaction === "dislike") {
-          setDislikeCount((count) => Math.max(0, count - 1));
-        }
-      } else {
-        setDislikeCount((count) => count + 1);
-
-        if (currentReaction === "like") {
-          setLikeCount((count) => Math.max(0, count - 1));
-        }
-      }
-
-      return nextReaction;
-    });
-  };
 
   return (
     <div
@@ -255,17 +222,11 @@ const TimelineCard = ({
             onClick={() => setIsCommentsOpen((value) => !value)}
           />
           <CuteDownloadLink href={downloadHref} />
-          <CuteActionButton
-            icon={isPet ? "🐾" : "♡"}
-            label={`${reaction === "like" ? "已喜欢" : "喜欢"} ${likeCount}`}
-            pressed={reaction === "like"}
-            onClick={() => toggleReaction("like")}
-          />
+          <CuteLikeButton postId={post.id} />
           <CuteActionButton
             icon={isPet ? "😿" : "×"}
-            label={`${reaction === "dislike" ? "已踩踩" : "差评"} ${dislikeCount}`}
-            pressed={reaction === "dislike"}
-            onClick={() => toggleReaction("dislike")}
+            label={`差评 ${dislikeCount}`}
+            onClick={() => setDislikeCount((count) => count + 1)}
           />
         </div>
         {isCommentsOpen ? (
@@ -304,12 +265,8 @@ const TimelineCard = ({
   );
 };
 
-const getInitialReactionCount = (id: string, type: "like" | "dislike") => {
+const getInitialDislikeCount = (id: string) => {
   const seed = id.split("").reduce((total, char) => total + char.charCodeAt(0), 0);
-
-  if (type === "like") {
-    return (seed % 18) + 3;
-  }
 
   return seed % 4;
 };

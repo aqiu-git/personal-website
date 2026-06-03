@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { MarkdownContent } from "@/components/markdown-content";
 import { PostImageGrid } from "@/components/post-image-grid";
 import { PostCommentsPanel } from "@/components/post-comments-panel";
+import { PostReactionBar } from "@/components/post-reaction-bar";
 import { Badge } from "@/components/ui/badge";
 import { getDownloadHref } from "@/lib/download";
 import { getPublishedPostBySlug } from "@/lib/posts";
@@ -103,7 +104,10 @@ const PostPage = async ({ params }: PostPageProps) => {
         <MarkdownContent content={post.content} />
       </article>
 
-      <PostCommentsPanel postId={post.id} comments={post.comments} id="comments" />
+      <section className="space-y-3" aria-label="评论互动">
+        <PostReactionBar postId={post.id} />
+        <PostCommentsPanel postId={post.id} comments={post.comments} id="comments" />
+      </section>
     </main>
   );
 };
