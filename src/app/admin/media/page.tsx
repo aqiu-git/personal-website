@@ -4,6 +4,7 @@ import { AdminNav } from "@/components/admin-nav";
 import { MediaUploadForm } from "@/components/media-upload-form";
 import { Badge } from "@/components/ui/badge";
 import { getPageAdmin } from "@/lib/auth";
+import { isLocalUploadUrl } from "@/lib/media";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -37,6 +38,7 @@ const AdminMediaPage = async () => {
                 width={600}
                 height={400}
                 className="aspect-[4/3] w-full object-cover"
+                unoptimized={isLocalUploadUrl(item.url)}
               />
             ) : (
               <div className="flex aspect-[4/3] items-center justify-center bg-muted text-sm text-muted-foreground">

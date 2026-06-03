@@ -7,6 +7,7 @@ import { AdminPostForm } from "@/components/admin-post-form";
 import { CommentStatusActions } from "@/components/comment-status-actions";
 import { Badge } from "@/components/ui/badge";
 import { getPageAdmin } from "@/lib/auth";
+import { isLocalUploadUrl } from "@/lib/media";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 
@@ -64,6 +65,7 @@ const AdminPostsPage = async () => {
                     width={224}
                     height={160}
                     className="h-24 w-28 rounded-md object-cover"
+                    unoptimized={isLocalUploadUrl(post.coverImage)}
                   />
                 ) : (
                   <div className="flex h-24 w-28 items-center justify-center rounded-md bg-muted text-xs text-muted-foreground">

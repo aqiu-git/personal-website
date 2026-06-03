@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { isLocalUploadUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
 export type PostGridImage = {
@@ -24,7 +25,7 @@ export const PostImageGrid = ({ images, href, priority = false, className }: Pos
 
   if (visibleImages.length === 1) {
     const image = visibleImages[0];
-    const isLocalUpload = image.url.startsWith("/uploads/");
+    const isLocalUpload = isLocalUploadUrl(image.url);
     const content = (
       <Image
         src={image.url}
@@ -51,7 +52,7 @@ export const PostImageGrid = ({ images, href, priority = false, className }: Pos
   return (
     <div className={cn("grid gap-1.5", columnClass, className)}>
       {visibleImages.map((image, index) => {
-        const isLocalUpload = image.url.startsWith("/uploads/");
+        const isLocalUpload = isLocalUploadUrl(image.url);
         const content = (
           <Image
             src={image.url}

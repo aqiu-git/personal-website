@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { getDownloadHref } from "@/lib/download";
+import { isLocalUploadUrl } from "@/lib/media";
 import { cn, formatDate } from "@/lib/utils";
 
 export type CategoryTimelinePost = {
@@ -161,6 +162,7 @@ export const CategoryTimeline = ({ posts }: CategoryTimelineProps) => {
                 width={44}
                 height={34}
                 className="h-8 w-11 rounded-md border border-orange-100 object-cover"
+                unoptimized={isLocalUploadUrl(post.coverImage)}
               />
             ) : null}
           </button>
@@ -621,6 +623,7 @@ const MiniTimelineRail = ({
                     width={108}
                     height={76}
                     className="absolute h-16 w-24 rounded-xl border border-orange-100 object-cover shadow-sm shadow-orange-100/70"
+                    unoptimized={isLocalUploadUrl(item.post.coverImage)}
                     style={{
                       left: `${isRight ? offset : -offset}px`,
                       top: `${offset}px`,
