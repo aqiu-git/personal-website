@@ -24,6 +24,7 @@ export const PostImageGrid = ({ images, href, priority = false, className }: Pos
 
   if (visibleImages.length === 1) {
     const image = visibleImages[0];
+    const isLocalUpload = image.url.startsWith("/uploads/");
     const content = (
       <Image
         src={image.url}
@@ -32,6 +33,7 @@ export const PostImageGrid = ({ images, href, priority = false, className }: Pos
         height={620}
         className="aspect-[4/3] w-full rounded-2xl object-cover transition-transform duration-500 group-hover:scale-[1.025]"
         priority={priority}
+        unoptimized={isLocalUpload}
       />
     );
 
@@ -49,6 +51,7 @@ export const PostImageGrid = ({ images, href, priority = false, className }: Pos
   return (
     <div className={cn("grid gap-1.5", columnClass, className)}>
       {visibleImages.map((image, index) => {
+        const isLocalUpload = image.url.startsWith("/uploads/");
         const content = (
           <Image
             src={image.url}
@@ -57,6 +60,7 @@ export const PostImageGrid = ({ images, href, priority = false, className }: Pos
             height={360}
             className="aspect-square w-full rounded-xl object-cover transition-transform duration-500 group-hover:scale-[1.025]"
             priority={priority && index === 0}
+            unoptimized={isLocalUpload}
           />
         );
 
