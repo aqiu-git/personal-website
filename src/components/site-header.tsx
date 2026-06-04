@@ -11,5 +11,10 @@ export const SiteHeader = () => (
       <HeaderNav />
       <ThemeToggle />
     </div>
+    <div className="border-t border-border/70 md:hidden">
+      <div className="container overflow-x-auto">
+        <HeaderNav className="flex h-11 min-w-max gap-5 text-sm" />
+      </div>
+    </div>
   </header>
 );

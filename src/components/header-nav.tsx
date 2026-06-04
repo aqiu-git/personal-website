@@ -21,11 +21,15 @@ const isActiveLink = (pathname: string, href: string) => {
   return pathname === href || pathname.startsWith(`${href}/`);
 };
 
-export const HeaderNav = () => {
+type HeaderNavProps = {
+  className?: string;
+};
+
+export const HeaderNav = ({ className }: HeaderNavProps) => {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden items-center gap-5 text-sm text-muted-foreground md:flex">
+    <nav className={cn("hidden items-center gap-5 text-sm text-muted-foreground md:flex", className)}>
       {links.map((link) => {
         const isActive = isActiveLink(pathname, link.href);
 
