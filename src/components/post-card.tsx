@@ -47,15 +47,17 @@ export const PostCard = ({ post, priority = false }: PostCardProps) => {
         priority={priority}
         className="rounded-none p-0"
       />
-      <CardContent className="space-y-3 p-5">
+      <CardContent className="space-y-2.5 p-4 md:space-y-3 md:p-5">
         <div className="flex flex-wrap gap-2">
           <Badge>{post.category.parent?.name ?? post.category.name}</Badge>
           <Badge>{post.type}</Badge>
         </div>
         <Link href={`/posts/${post.slug}`} className="block hover:text-primary">
-          <h2 className="text-xl font-semibold tracking-normal">{post.title}</h2>
+          <h2 className="text-lg font-semibold tracking-normal md:text-xl">{post.title}</h2>
         </Link>
-        <p className="text-sm leading-6 text-muted-foreground">{post.summary ?? post.description}</p>
+        <p className="line-clamp-2 text-sm leading-6 text-muted-foreground md:line-clamp-none">
+          {post.summary ?? post.description}
+        </p>
         <p className="text-xs text-muted-foreground">
           {formatDate(post.publishedAt ?? post.createdAt)}
         </p>

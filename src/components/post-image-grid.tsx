@@ -32,18 +32,18 @@ export const PostImageGrid = ({ images, href, priority = false, className }: Pos
         alt={image.alt}
         width={900}
         height={620}
-        className="aspect-[4/3] w-full rounded-2xl object-cover transition-transform duration-500 group-hover:scale-[1.025]"
+        className="aspect-[5/4] w-full rounded-lg object-cover transition-transform duration-500 group-hover:scale-[1.025] sm:aspect-[4/3] md:rounded-2xl"
         priority={priority}
         unoptimized={isLocalUpload}
       />
     );
 
     return href ? (
-      <Link href={href} className={cn("group block overflow-hidden rounded-2xl", className)}>
+      <Link href={href} className={cn("group block overflow-hidden rounded-lg md:rounded-2xl", className)}>
         {content}
       </Link>
     ) : (
-      <div className={cn("overflow-hidden rounded-2xl", className)}>{content}</div>
+      <div className={cn("overflow-hidden rounded-lg md:rounded-2xl", className)}>{content}</div>
     );
   }
 
@@ -59,7 +59,7 @@ export const PostImageGrid = ({ images, href, priority = false, className }: Pos
             alt={image.alt}
             width={360}
             height={360}
-            className="aspect-square w-full rounded-xl object-cover transition-transform duration-500 group-hover:scale-[1.025]"
+            className="aspect-square w-full rounded-md object-cover transition-transform duration-500 group-hover:scale-[1.025] md:rounded-xl"
             priority={priority && index === 0}
             unoptimized={isLocalUpload}
           />
@@ -69,12 +69,12 @@ export const PostImageGrid = ({ images, href, priority = false, className }: Pos
           <Link
             key={image.id}
             href={href}
-            className="group block overflow-hidden rounded-xl bg-muted"
+            className="group block overflow-hidden rounded-md bg-muted md:rounded-xl"
           >
             {content}
           </Link>
         ) : (
-          <div key={image.id} className="overflow-hidden rounded-xl bg-muted">
+          <div key={image.id} className="overflow-hidden rounded-md bg-muted md:rounded-xl">
             {content}
           </div>
         );
