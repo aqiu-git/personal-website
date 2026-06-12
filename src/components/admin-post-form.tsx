@@ -168,7 +168,7 @@ export const AdminPostForm = ({ categories }: AdminPostFormProps) => {
           setIsSubmitting(false);
 
           if (!response.ok) {
-            setMessage("发布失败，请检查标题、类目和正文。");
+            setMessage("发布失败，请检查标题和类目。");
             return;
           }
 
@@ -214,7 +214,7 @@ export const AdminPostForm = ({ categories }: AdminPostFormProps) => {
             </select>
           </label>
         </div>
-        <Input name="description" placeholder="一句话描述" required className={inputClass} />
+        <Input name="description" placeholder="一句话描述，可选" className={inputClass} />
         <Input name="summary" placeholder="摘要，可选" className={inputClass} />
         <div className="grid gap-3 md:grid-cols-2">
           <AdminMediaPicker resetKey={mediaResetKey} />
@@ -228,8 +228,7 @@ export const AdminPostForm = ({ categories }: AdminPostFormProps) => {
         </div>
         <Textarea
           name="content"
-          placeholder="正文内容或媒体说明"
-          required
+          placeholder="正文内容或媒体说明，可选"
           className="min-h-36 rounded-3xl border-sky-100 bg-white/90 focus-visible:ring-sky-200"
         />
         <div className="flex flex-wrap items-center gap-3">

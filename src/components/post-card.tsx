@@ -40,12 +40,13 @@ export const PostCard = ({ post, priority = false }: PostCardProps) => {
         : [];
 
   return (
-    <Card className="break-inside-avoid overflow-hidden">
+    <Card className="break-inside-avoid overflow-hidden rounded-3xl border-sky-100 shadow-sm shadow-sky-100/60 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
       <PostImageGrid
         images={gridImages}
         href={`/posts/${post.slug}`}
         priority={priority}
         className="rounded-none p-0"
+        previewOnMultiImage
       />
       <CardContent className="space-y-2.5 p-4 md:space-y-3 md:p-5">
         <div className="flex flex-wrap gap-2">

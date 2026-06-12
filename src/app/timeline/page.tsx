@@ -86,7 +86,7 @@ const TimelineImages = ({ post }: { post: Awaited<ReturnType<typeof getPublished
         : [];
 
   return gridImages.length > 0 ? (
-    <PostImageGrid images={gridImages} href={`/posts/${post.slug}`} />
+    <PostImageGrid images={gridImages} href={`/posts/${post.slug}`} previewOnMultiImage />
   ) : (
     <div className="flex aspect-[16/11] items-center justify-center rounded-2xl bg-orange-50 text-xs text-muted-foreground">
       无缩图

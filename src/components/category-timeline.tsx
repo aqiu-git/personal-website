@@ -202,7 +202,12 @@ const TimelineCard = ({
           : "border-orange-100 shadow-orange-100/70"
       )}
     >
-      <PostImageGrid images={gridImages} href={`/posts/${post.slug}`} priority={priority} />
+      <PostImageGrid
+        images={gridImages}
+        href={`/posts/${post.slug}`}
+        priority={priority}
+        previewOnMultiImage
+      />
       <div className="space-y-4 p-5">
         <div className="flex flex-wrap gap-2">
           <Badge className="border-orange-100 bg-orange-50 text-orange-700">

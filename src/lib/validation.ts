@@ -31,8 +31,8 @@ export const postQuerySchema = z.object({
 export const postMutationSchema = z.object({
   title: z.string().min(1),
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
-  description: z.string().min(1),
-  content: z.string().min(1),
+  description: z.string().default(""),
+  content: z.string().default(""),
   summary: z.string().optional(),
   type: z.nativeEnum(PostType).default(PostType.ARTICLE),
   status: z.nativeEnum(PostStatus).default(PostStatus.DRAFT),
