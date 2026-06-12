@@ -155,7 +155,7 @@ export const AdminPostForm = ({ categories }: AdminPostFormProps) => {
               slug: makeSlug(formData.get("slug")?.toString() || title),
               description: formData.get("description")?.toString().trim(),
               summary: formData.get("summary")?.toString().trim() || undefined,
-              content: coverImage && !content ? `![${title}](${coverImage})` : content,
+              content,
               type: postType,
               status,
               coverImage,

@@ -55,6 +55,14 @@ const PostPage = async ({ params }: PostPageProps) => {
       : post.coverImage
         ? [{ id: post.id, url: post.coverImage, alt: post.title }]
         : [];
+  const trimmedContent = post.content.trim();
+  const duplicateImageOnlyContent =
+    gridImages.length > 0 &&
+    gridImages.some((image) => {
+      const escapedUrl = image.url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(`^!\\[[^\\]]*\\]\\(${escapedUrl}\\)$`).test(trimmedContent);
+    });
+  const visibleContent = duplicateImageOnlyContent ? "" : post.content;
 
   return (
     <main className="container max-w-4xl space-y-10 py-12">
@@ -74,7 +82,7 @@ const PostPage = async ({ params }: PostPageProps) => {
 
         {gridImages.length > 0 ? (
           <div className="space-y-3">
-            <PostImageGrid images={gridImages} priority />
+            <PostImageGrid images={gridImages} priority display="detail" />
             <div className="flex flex-wrap gap-2">
               {gridImages.map((image, index) => {
                 const downloadHref = getDownloadHref(image.url, `${post.slug}-${index + 1}`);
@@ -101,7 +109,7 @@ const PostPage = async ({ params }: PostPageProps) => {
           </section>
         ) : null}
 
-        <MarkdownContent content={post.content} />
+        {visibleContent ? <MarkdownContent content={visibleContent} /> : null}
       </article>
 
       <section className="space-y-3" aria-label="评论互动">

@@ -46,7 +46,6 @@ export const PostCard = ({ post, priority = false }: PostCardProps) => {
         href={`/posts/${post.slug}`}
         priority={priority}
         className="rounded-none p-0"
-        previewOnMultiImage
       />
       <CardContent className="space-y-2.5 p-4 md:space-y-3 md:p-5">
         <div className="flex flex-wrap gap-2">

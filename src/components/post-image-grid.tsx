@@ -19,6 +19,7 @@ type PostImageGridProps = {
   href?: string;
   priority?: boolean;
   className?: string;
+  display?: "card" | "detail";
   previewOnMultiImage?: boolean;
 };
 
@@ -40,6 +41,7 @@ export const PostImageGrid = ({
   href,
   priority = false,
   className,
+  display = "card",
   previewOnMultiImage = false
 }: PostImageGridProps) => {
   const visibleImages = images.slice(0, 9);
@@ -275,9 +277,14 @@ export const PostImageGrid = ({
       <Image
         src={image.url}
         alt={image.alt}
-        width={900}
-        height={620}
-        className="aspect-[5/4] w-full rounded-lg object-cover transition-transform duration-500 group-hover:scale-[1.025] sm:aspect-[4/3] md:rounded-2xl"
+        width={display === "detail" ? 1600 : 900}
+        height={display === "detail" ? 1200 : 620}
+        className={cn(
+          "w-full rounded-lg transition-transform duration-500 group-hover:scale-[1.025] md:rounded-2xl",
+          display === "detail"
+            ? "max-h-[78vh] object-contain"
+            : "aspect-[5/4] object-cover sm:aspect-[4/3]"
+        )}
         priority={priority}
         unoptimized={isLocalUpload}
       />
