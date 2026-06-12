@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { MouseEvent } from "react";
+import type { PointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { isLocalUploadUrl } from "@/lib/media";
@@ -60,7 +60,7 @@ export const PostImageGrid = ({
     hideMagnifier();
   };
 
-  const handlePreviewMouseMove = (event: MouseEvent<HTMLDivElement>) => {
+  const handlePreviewPointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const frame = previewFrameRef.current;
 
     if (!frame) {
@@ -93,7 +93,7 @@ export const PostImageGrid = ({
     });
   };
 
-  const handleLightboxMouseMove = (event: MouseEvent<HTMLDivElement>) => {
+  const handleLightboxPointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const frame = previewFrameRef.current;
 
     if (!frame) {
@@ -162,7 +162,7 @@ export const PostImageGrid = ({
       role="dialog"
       aria-modal="true"
       aria-label="Image preview"
-      onMouseMove={handleLightboxMouseMove}
+      onPointerMove={handleLightboxPointerMove}
       onClick={closePreview}
     >
       <button
@@ -205,9 +205,15 @@ export const PostImageGrid = ({
       ) : null}
       <div
         ref={previewFrameRef}
-        className="relative cursor-none"
-        onMouseMove={handlePreviewMouseMove}
-        onMouseLeave={hideMagnifier}
+        className="relative cursor-none touch-none"
+        onPointerDown={(event) => {
+          event.currentTarget.setPointerCapture(event.pointerId);
+          handlePreviewPointerMove(event);
+        }}
+        onPointerMove={handlePreviewPointerMove}
+        onPointerLeave={hideMagnifier}
+        onPointerCancel={hideMagnifier}
+        onPointerUp={hideMagnifier}
         onClick={(event) => event.stopPropagation()}
       >
         <Image
@@ -282,8 +288,8 @@ export const PostImageGrid = ({
         className={cn(
           "w-full rounded-lg transition-transform duration-500 group-hover:scale-[1.025] md:rounded-2xl",
           display === "detail"
-            ? "max-h-[78vh] object-contain"
-            : "aspect-[5/4] object-cover sm:aspect-[4/3]"
+            ? "mx-auto h-auto max-h-[78vh] max-w-full object-contain"
+            : "aspect-[5/4] bg-sky-50/70 object-contain sm:aspect-[4/3] md:object-cover"
         )}
         priority={priority}
         unoptimized={isLocalUpload}
@@ -324,7 +330,7 @@ export const PostImageGrid = ({
             alt={image.alt}
             width={360}
             height={360}
-            className="aspect-square w-full rounded-md object-cover transition-transform duration-500 group-hover:scale-[1.025] md:rounded-xl"
+            className="aspect-square w-full rounded-md bg-sky-50/70 object-contain transition-transform duration-500 group-hover:scale-[1.025] md:rounded-xl md:object-cover"
             priority={priority && index === 0}
             unoptimized={isLocalUpload}
           />
